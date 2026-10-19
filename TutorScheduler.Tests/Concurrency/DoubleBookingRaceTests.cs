@@ -568,9 +568,9 @@ public class DoubleBookingRaceTests : IDisposable
         var subject = await AddSubjectAsync();
         var tutor = await AddUserAsync("tutor", UserRole.Tutor);
 
-        var first = await NewLessonSlotService().CreateAsync(tutor, subject, _tenOClock, _tenOClock.AddHours(1), CancellationToken.None);
-        var overlapping = await NewLessonSlotService().CreateAsync(tutor, subject, _tenOClock.AddMinutes(30), _tenOClock.AddMinutes(90), CancellationToken.None);
-        var adjacent = await NewLessonSlotService().CreateAsync(tutor, subject, _tenOClock.AddHours(1), _tenOClock.AddHours(2), CancellationToken.None);
+        var first = await NewLessonSlotService().CreateAsync(tutor, subject, _tenOClock, _tenOClock.AddHours(1), price: 100m, CancellationToken.None);
+        var overlapping = await NewLessonSlotService().CreateAsync(tutor, subject, _tenOClock.AddMinutes(30), _tenOClock.AddMinutes(90), price: 100m, CancellationToken.None);
+        var adjacent = await NewLessonSlotService().CreateAsync(tutor, subject, _tenOClock.AddHours(1), _tenOClock.AddHours(2), price: 100m, CancellationToken.None);
 
         Assert.True(first.IsSuccess);
         Assert.Equal(ResultStatus.Conflict, overlapping.Status);
@@ -590,8 +590,8 @@ public class DoubleBookingRaceTests : IDisposable
 
         var (firstResult, secondResult) = await InterleaveAsync(
             gate,
-            () => firstService.CreateAsync(tutor, subject, _tenOClock, _tenOClock.AddHours(1), CancellationToken.None),
-            () => secondService.CreateAsync(tutor, subject, _tenOClock.AddMinutes(15), _tenOClock.AddMinutes(75), CancellationToken.None));
+            () => firstService.CreateAsync(tutor, subject, _tenOClock, _tenOClock.AddHours(1), price: 100m, CancellationToken.None),
+            () => secondService.CreateAsync(tutor, subject, _tenOClock.AddMinutes(15), _tenOClock.AddMinutes(75), price: 100m, CancellationToken.None));
 
         Assert.True(secondResult.IsSuccess);
         Assert.Equal(ResultStatus.Conflict, firstResult.Status);
@@ -614,7 +614,7 @@ public class DoubleBookingRaceTests : IDisposable
         Assert.True((await NewLessonSlotService().DeleteAsync(tutor, slot, CancellationToken.None)).IsSuccess);
         Assert.Equal(SlotStatus.Cancelled, SlotStatusOf(slot));
 
-        var replacement = await NewLessonSlotService().CreateAsync(tutor, subject, _tenOClock, _tenOClock.AddHours(1), CancellationToken.None);
+        var replacement = await NewLessonSlotService().CreateAsync(tutor, subject, _tenOClock, _tenOClock.AddHours(1), price: 100m, CancellationToken.None);
 
         Assert.True(replacement.IsSuccess);
     }

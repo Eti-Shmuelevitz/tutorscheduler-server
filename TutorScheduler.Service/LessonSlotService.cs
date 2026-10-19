@@ -9,6 +9,8 @@ namespace TutorScheduler.Service;
 
 public class LessonSlotService : ILessonSlotService
 {
+    private const decimal MaxPrice = 10_000m;
+
     private readonly ILessonSlotRepository _lessonSlotRepository;
     private readonly ISubjectRepository _subjectRepository;
     private readonly IBookingRepository _bookingRepository;
@@ -58,7 +60,7 @@ public class LessonSlotService : ILessonSlotService
         _lessonSlotRepository.GetByTutorPagedAsync(tutorId, page, pageSize, ct);
 
     public async Task<Result<LessonSlot>> CreateAsync(
-        int tutorId, int subjectId, DateTime startUtc, DateTime endUtc, CancellationToken ct)
+        int tutorId, int subjectId, DateTime startUtc, DateTime endUtc, decimal price, CancellationToken ct)
     {
         startUtc = ToUtc(startUtc);
         endUtc = ToUtc(endUtc);
@@ -66,6 +68,11 @@ public class LessonSlotService : ILessonSlotService
         if (startUtc >= endUtc)
         {
             return Result<LessonSlot>.Fail("Start time must be before end time.");
+        }
+
+        if (price < 0 || price > MaxPrice)
+        {
+            return Result<LessonSlot>.Fail("Price must be between 0 and 10,000.");
         }
 
         if (startUtc < DateTime.UtcNow)
@@ -103,6 +110,7 @@ public class LessonSlotService : ILessonSlotService
             SubjectId = subjectId,
             StartTimeUtc = startUtc,
             EndTimeUtc = endUtc,
+            Price = decimal.Round(price, 2),
             Status = SlotStatus.Available
         };
 

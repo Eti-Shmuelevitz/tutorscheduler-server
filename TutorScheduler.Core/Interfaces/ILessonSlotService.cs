@@ -13,7 +13,7 @@ public interface ILessonSlotService
     Task<(IReadOnlyList<LessonSlot> Items, int TotalCount)> GetByTutorPagedAsync(
         int tutorId, int page, int pageSize, CancellationToken ct);
 
-    Task<Result<LessonSlot>> CreateAsync(int tutorId, int subjectId, DateTime startUtc, DateTime endUtc, CancellationToken ct);
+    Task<Result<LessonSlot>> CreateAsync(int tutorId, int subjectId, DateTime startUtc, DateTime endUtc, decimal price, CancellationToken ct);
 
     // Rejected once the slot has any booking history, not just while Active -
     // editing a slot after a cancelled booking still rewrites what the student saw.

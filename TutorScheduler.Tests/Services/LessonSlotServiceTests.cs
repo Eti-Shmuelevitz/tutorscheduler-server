@@ -51,7 +51,7 @@ public class LessonSlotServiceTests
     public async Task CreateAsync_StartAfterEnd_ReturnsValidationError()
     {
         var result = await _sut.CreateAsync(
-            TutorId, subjectId: 1, DateTime.UtcNow.AddHours(2), DateTime.UtcNow.AddHours(1), CancellationToken.None);
+            TutorId, subjectId: 1, DateTime.UtcNow.AddHours(2), DateTime.UtcNow.AddHours(1), price: 100m, CancellationToken.None);
 
         Assert.Equal(ResultStatus.ValidationError, result.Status);
     }
@@ -61,7 +61,7 @@ public class LessonSlotServiceTests
     {
         var at = DateTime.UtcNow.AddHours(2);
 
-        var result = await _sut.CreateAsync(TutorId, subjectId: 1, at, at, CancellationToken.None);
+        var result = await _sut.CreateAsync(TutorId, subjectId: 1, at, at, price: 100m, CancellationToken.None);
 
         Assert.Equal(ResultStatus.ValidationError, result.Status);
     }
@@ -70,7 +70,7 @@ public class LessonSlotServiceTests
     public async Task CreateAsync_StartInPast_ReturnsValidationError()
     {
         var result = await _sut.CreateAsync(
-            TutorId, subjectId: 1, DateTime.UtcNow.AddHours(-1), DateTime.UtcNow.AddHours(1), CancellationToken.None);
+            TutorId, subjectId: 1, DateTime.UtcNow.AddHours(-1), DateTime.UtcNow.AddHours(1), price: 100m, CancellationToken.None);
 
         Assert.Equal(ResultStatus.ValidationError, result.Status);
     }
@@ -79,7 +79,7 @@ public class LessonSlotServiceTests
     public async Task CreateAsync_SubjectNotFound_ReturnsNotFound()
     {
         var result = await _sut.CreateAsync(
-            TutorId, subjectId: 42, DateTime.UtcNow.AddHours(1), DateTime.UtcNow.AddHours(2), CancellationToken.None);
+            TutorId, subjectId: 42, DateTime.UtcNow.AddHours(1), DateTime.UtcNow.AddHours(2), price: 100m, CancellationToken.None);
 
         Assert.Equal(ResultStatus.NotFound, result.Status);
     }
@@ -90,12 +90,34 @@ public class LessonSlotServiceTests
         var before = _tutor.ScheduleVersion;
 
         var result = await _sut.CreateAsync(
-            TutorId, subjectId: 1, DateTime.UtcNow.AddHours(1), DateTime.UtcNow.AddHours(2), CancellationToken.None);
+            TutorId, subjectId: 1, DateTime.UtcNow.AddHours(1), DateTime.UtcNow.AddHours(2), price: 100m, CancellationToken.None);
 
         Assert.True(result.IsSuccess);
         Assert.Equal(SlotStatus.Available, result.Value!.Status);
         Assert.NotEqual(before, _tutor.ScheduleVersion);
         _lessonSlotRepository.Verify(r => r.Add(It.Is<LessonSlot>(s => s.TutorId == TutorId && s.SubjectId == 1)), Times.Once);
+    }
+
+    [Theory]
+    [InlineData(-1)]
+    [InlineData(10_000.01)]
+    public async Task CreateAsync_PriceOutOfRange_ReturnsValidationError(decimal price)
+    {
+        var result = await _sut.CreateAsync(
+            TutorId, subjectId: 1, DateTime.UtcNow.AddHours(1), DateTime.UtcNow.AddHours(2), price, CancellationToken.None);
+
+        Assert.Equal(ResultStatus.ValidationError, result.Status);
+        _lessonSlotRepository.Verify(r => r.Add(It.IsAny<LessonSlot>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task CreateAsync_Valid_StoresPriceRoundedToAgorot()
+    {
+        var result = await _sut.CreateAsync(
+            TutorId, subjectId: 1, DateTime.UtcNow.AddHours(1), DateTime.UtcNow.AddHours(2), 149.999m, CancellationToken.None);
+
+        Assert.True(result.IsSuccess);
+        Assert.Equal(150.00m, result.Value!.Price);
     }
 
     // A tutor can't teach two lessons at once.
@@ -105,7 +127,7 @@ public class LessonSlotServiceTests
         GivenTutorHasOverlap();
 
         var result = await _sut.CreateAsync(
-            TutorId, subjectId: 1, DateTime.UtcNow.AddHours(1), DateTime.UtcNow.AddHours(2), CancellationToken.None);
+            TutorId, subjectId: 1, DateTime.UtcNow.AddHours(1), DateTime.UtcNow.AddHours(2), price: 100m, CancellationToken.None);
 
         Assert.Equal(ResultStatus.Conflict, result.Status);
         _lessonSlotRepository.Verify(r => r.Add(It.IsAny<LessonSlot>()), Times.Never);
@@ -119,7 +141,7 @@ public class LessonSlotServiceTests
             .ThrowsAsync(new DbUpdateConcurrencyException());
 
         var result = await _sut.CreateAsync(
-            TutorId, subjectId: 1, DateTime.UtcNow.AddHours(1), DateTime.UtcNow.AddHours(2), CancellationToken.None);
+            TutorId, subjectId: 1, DateTime.UtcNow.AddHours(1), DateTime.UtcNow.AddHours(2), price: 100m, CancellationToken.None);
 
         Assert.Equal(ResultStatus.Conflict, result.Status);
     }
@@ -131,7 +153,7 @@ public class LessonSlotServiceTests
         var start = DateTime.SpecifyKind(DateTime.UtcNow.AddHours(1), DateTimeKind.Unspecified);
         var end = DateTime.SpecifyKind(DateTime.UtcNow.AddHours(2), DateTimeKind.Unspecified);
 
-        var result = await _sut.CreateAsync(TutorId, subjectId: 1, start, end, CancellationToken.None);
+        var result = await _sut.CreateAsync(TutorId, subjectId: 1, start, end, price: 100m, CancellationToken.None);
 
         Assert.True(result.IsSuccess);
         Assert.Equal(DateTimeKind.Utc, result.Value!.StartTimeUtc.Kind);

@@ -12,6 +12,7 @@ public class LessonSlotResponseDto
     public DateTime StartTimeUtc { get; set; }
     public DateTime EndTimeUtc { get; set; }
     public SlotStatus Status { get; set; }
+    public decimal Price { get; set; }
 
     // Null unless a student currently holds an active booking on this slot.
     public string? StudentName { get; set; }

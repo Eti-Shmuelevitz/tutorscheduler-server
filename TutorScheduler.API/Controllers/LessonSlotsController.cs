@@ -92,7 +92,7 @@ public class LessonSlotsController : ApiControllerBase
     {
         var tutorId = _currentUser.UserId;
         var result = await _lessonSlotService.CreateAsync(
-            tutorId, request.SubjectId, request.StartTimeUtc, request.EndTimeUtc, ct);
+            tutorId, request.SubjectId, request.StartTimeUtc, request.EndTimeUtc, request.Price!.Value, ct);
 
         if (!result.IsSuccess)
         {

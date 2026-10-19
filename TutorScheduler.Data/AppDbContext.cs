@@ -63,6 +63,9 @@ public class AppDbContext : DbContext
             // concurrency token by convention; this line just makes it explicit.
             entity.Property(ls => ls.Version)
                 .IsConcurrencyToken();
+
+            entity.Property(ls => ls.Price)
+                .HasPrecision(10, 2);
         });
 
         // One-to-many: LessonSlot -> Booking (see comment on LessonSlot.Bookings

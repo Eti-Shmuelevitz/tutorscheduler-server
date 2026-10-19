@@ -20,6 +20,9 @@ public class LessonSlot
 
     public SlotStatus Status { get; set; } = SlotStatus.Available;
 
+    // Set by the tutor when publishing the slot, in ILS. 0 = free lesson.
+    public decimal Price { get; set; }
+
     // One-to-many, not one-to-one: a cancelled + rebooked slot needs a new
     // Booking row so the history isn't overwritten. "At most one Active
     // booking per slot" is a Service-layer business rule, not a DB constraint.

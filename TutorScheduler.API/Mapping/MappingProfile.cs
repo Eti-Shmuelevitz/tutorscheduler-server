@@ -27,7 +27,8 @@ public class MappingProfile : Profile
             .ForMember(dest => dest.SubjectName, opt => opt.MapFrom(src => src.LessonSlot.Subject.Name))
             .ForMember(dest => dest.TutorName, opt => opt.MapFrom(src => src.LessonSlot.Tutor.FullName))
             .ForMember(dest => dest.StartTimeUtc, opt => opt.MapFrom(src => src.LessonSlot.StartTimeUtc))
-            .ForMember(dest => dest.EndTimeUtc, opt => opt.MapFrom(src => src.LessonSlot.EndTimeUtc));
+            .ForMember(dest => dest.EndTimeUtc, opt => opt.MapFrom(src => src.LessonSlot.EndTimeUtc))
+            .ForMember(dest => dest.Price, opt => opt.MapFrom(src => src.LessonSlot.Price));
 
         CreateMap<Notification, NotificationResponseDto>()
             .ForMember(dest => dest.SubjectName, opt => opt.MapFrom(src => src.LessonSlot.Subject.Name))

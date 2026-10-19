@@ -10,6 +10,7 @@ public class BookingResponseDto
     public string TutorName { get; set; } = default!;
     public DateTime StartTimeUtc { get; set; }
     public DateTime EndTimeUtc { get; set; }
+    public decimal Price { get; set; }
     public DateTime BookedAtUtc { get; set; }
     public BookingStatus Status { get; set; }
 }

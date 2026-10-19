@@ -53,6 +53,7 @@ public static class SeedData
             SubjectId = subject.Id,
             StartTimeUtc = DateTime.UtcNow.AddDays(1),
             EndTimeUtc = DateTime.UtcNow.AddDays(1).AddHours(1),
+            Price = 120m,
             Status = SlotStatus.Available
         };
         lessonSlotRepository.Add(slot);
