@@ -137,11 +137,8 @@ using (var seedScope = app.Services.CreateScope())
 app.UseMiddleware<CorrelationIdMiddleware>();
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+app.UseSwagger();
+app.UseSwaggerUI();
 
 // Not in Development: the React dev server calls http://localhost:5041, and a
 // redirect to https on a CORS preflight makes the browser block the request.
