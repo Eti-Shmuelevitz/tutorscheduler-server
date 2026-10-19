@@ -106,7 +106,7 @@ const string ClientCorsPolicy = "ClientCorsPolicy";
 builder.Services.AddCors(options =>
 {
     options.AddPolicy(ClientCorsPolicy, policy =>
-        policy.WithOrigins("http://localhost:5173")
+        policy.WithOrigins("http://localhost:5173", "https://tutorscheduler-client.onrender.com")
               .AllowAnyHeader()
               .AllowAnyMethod());
 });
