@@ -1,0 +1,28 @@
+@host = http://localhost:5041/api
+
+# 1. Log in as the demo student and paste the returned token below.
+POST {{host}}/auth/login
+Content-Type: application/json
+
+{ "email": "student@demo.com", "password": "Passw0rd!" }
+
+###
+
+@token = paste-token-here
+
+# 2. Browse available slots (real server-side pagination).
+GET {{host}}/lessonslots?page=1&pageSize=5
+
+###
+
+# 3. Book slot 1. Run it twice: the second call returns 409 Conflict.
+POST {{host}}/lessonslots/1/bookings
+Authorization: Bearer {{token}}
+
+###
+
+# 4. My bookings.
+GET {{host}}/bookings/mine
+Authorization: Bearer {{token}}
+
+###

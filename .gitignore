@@ -1,0 +1,19 @@
+# Build output
+bin/
+obj/
+
+# Visual Studio / Rider
+.vs/
+.idea/
+*.user
+*.suo
+
+# NLog output (runtime-generated, environment-specific)
+**/logs/
+internal-nlog.txt
+
+# Test results
+TestResults/
+
+# User Secrets are stored outside this repo (%APPDATA%\Microsoft\UserSecrets)
+# by design - nothing secret-bearing should ever land inside the repo tree.
